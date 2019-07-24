@@ -82,6 +82,7 @@
             <div class="content">
                 <div class="title m-b-md">
                     <h3>HELLO WOLRD!</h3>
+                    <p>TEST ON FEATURE BRANCH</p>
                     Laravel
                 </div>
 
