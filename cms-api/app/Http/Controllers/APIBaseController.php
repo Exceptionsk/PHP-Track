@@ -163,7 +163,7 @@ class APIBaseController extends BaseController
                 break;
             case '404':
                 $error = array(
-                    'message'   =>  'The resource that match ID: ({$id}) does not found.',
+                    'message'   =>  'The resource that match ID: ( '.$id.' ) does not found.',
                     'code'      =>  400001
                 );
                 $this->errors($error);

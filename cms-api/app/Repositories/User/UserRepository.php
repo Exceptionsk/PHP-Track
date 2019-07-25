@@ -34,18 +34,22 @@ class UserRepository implements UserInterface
   }
 
   public function store($data){
-    try {
-
-
       $this->user->fill($data);
-      // dd($data);
-      if ($this->user->store()) {
+      if ($this->user->saveuser()) {
         return $this->user->id;
       }
-
-    } catch (\Exception $e) {
-    }
-
   }
 
+  public function softdelete($id)
+  {
+    $this->user = $this->user->find($id);
+    $this->user->softdelete();
+  }
+
+  public function updateuser($request, $id)
+  {
+    $this->user = $this->user->find($id);
+    $this->user->fill($request);
+    $this->user->saveuser();
+  }
 }

@@ -1,11 +1,11 @@
 <?php
-namespace App\Repositories\User;
+namespace App\Repositories\Category;
 
-interface UserRepositoryInterface{
+interface CategoryRepositoryInterface{
   public function getAll($offset, $limit);
   public function find($id);
   public function total();
   public function store($data);
-  public function updateuser($request, $id);
+  public function updateCategory($request, $id);
   public function delete($id);
 }

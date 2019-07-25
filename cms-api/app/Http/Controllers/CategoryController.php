@@ -3,39 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Category;
 use App\Http\Controllers\APIBaseController as BaseController;
 use Illuminate\Http\Request;
 use App\Repositories\User\UserRepositoryInterface as UserInterface;
+use App\Repositories\Category\CategoryRepositoryInterface as CategoryInterface;
 
-class UserController extends BaseController
+class CategoryController extends BaseController
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public $user;
 
-    public function __construct(Request $request, UserInterface $user)
+    public $user;
+    public $category;
+
+    public function __construct(Request $request, UserInterface $user, CategoryInterface $category)
     {
-      $this->user = $user;
-      $this->method     = $request->getMethod();
-      $this->endpoint   = $request->path();
-      $this->startTime  = microtime(true);
+       $this->user = $user;
+       $this->category = $category;
+
+       $this->method     = $request->getMethod();
+       $this->endpoint   = $request->path();
+       $this->startTime  = microtime(true);
     }
+
     public function index(Request $request)
     {
       $this->offset = isset($request->offset)? $request->offset : 0;
       $this->limit = isset($request->limit)? $request->limit : 0;
 
-      $users  = $this->user->getAll($this->offset, $this->limit);
+      $category  = $this->category->getAll($this->offset, $this->limit);
 
-      $total = $this->user->total();
+      $total = $this->category->total();
 
-      $this->data($users);
+      $this->data($category);
       $this->total($total);
       return $this->response('200');
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -53,19 +61,27 @@ class UserController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-       $user=$request->validate([
-        'name'      =>  'required',
-        'email'     =>  'required',
-        'password'  => 'required'
-      ]);
-     $result = $this->user->store($user);
-     if (isset($result)) {
-       $this->data(array('id' =>  $result));
+     public function store(Request $request)
+     {
+        $category=$request->validate([
+         'name'        =>  'required',
+         'user_id'     =>  'required',
+         'slug'        => 'required',
+         'description' => 'required'
+       ]);
+
+       $user = $this->user->find($request->user_id);
+       if (empty($user)) {
+           $this->setError('404', $request->user_id);
+           return $this->response('404');
+       }else{
+         $result = $this->category->store($category);
+         if (isset($result)) {
+           $this->data(array('id' =>  $result));
+         }
+         return $this->response('201');
+       }
      }
-     return $this->response('201');
-    }
 
     /**
      * Display the specified resource.
@@ -75,12 +91,12 @@ class UserController extends BaseController
      */
     public function show($id)
     {
-      $user = $this->user->find($id);
-      if (empty($user)) {
+      $category = $this->category->find($id);
+      if (empty($category)) {
           $this->setError('404', $id);
           return $this->response('404');
       }else{
-        $this->data(array($user));
+        $this->data(array($category));
         return $this->response('201');
       }
     }
@@ -94,8 +110,6 @@ class UserController extends BaseController
     public function edit($id)
     {
         //
-
-
     }
 
     /**
@@ -107,12 +121,12 @@ class UserController extends BaseController
      */
     public function update(Request $request, $id)
     {
-      $user = $this->user->find($id);
-      if (empty($user)) {
+      $category = $this->category->find($id);
+      if (empty($category)) {
           $this->setError('404', $id);
           return $this->response('404');
       }else{
-        $this->user->updateuser($request->all(),$id);
+        $this->category->updateCategory($request->all(),$id);
         $this->data(array('updated' =>  1));
         return $this->response('200');
       }
@@ -126,14 +140,14 @@ class UserController extends BaseController
      */
     public function destroy($id)
     {
-        $user = User::find($id);
-        if (empty($user)) {
-            $this->setError('404', $id);
-            return $this->response('404');
-        }else{
-          $this->user->softdelete($id);
-          $this->data(array('deleted' =>  1));
-          return $this->response('200');
-        }
+      $category = Category::find($id);
+      if (empty($category)) {
+          $this->setError('404', $id);
+          return $this->response('404');
+      }else{
+        $this->category->softdelete($id);
+        $this->data(array('deleted' =>  1));
+        return $this->response('200');
+      }
     }
 }

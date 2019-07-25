@@ -3,15 +3,20 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Model
 {
+  use SoftDeletes;
+
+  protected $dates = ['deleted_at'];
+
   protected $fillable=[
       'name', 'email', 'password',
   ];
 
   protected $hidden=[
-    'password', 'remember_token'
+     'created_at', 'deleted_at'
   ];
 
   public function pages()
@@ -29,6 +34,7 @@ class User extends Model
   {
     return $this->hasMany(Media::class);
   }
+
 
   public function categories()
   {
@@ -58,10 +64,17 @@ class User extends Model
     return static::find($id)->delete();
   }
 
-  public function store()
+  public function saveuser()
   {
     if (static::save()) {
       return true;
     }
+
   }
+
+  public function softdelete()
+  {
+     static::delete();
+  }
+
 }
